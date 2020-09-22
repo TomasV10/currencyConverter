@@ -1,0 +1,115 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.lb.lt/WebServices/FxRates" targetNamespace="http://www.lb.lt/WebServices/FxRates" elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xsd:include schemaLocation="Ccy.xsd"/>
+    <xsd:element name="FxRates" type="FxRatesHandling"/>
+    <xsd:complexType name="FxRatesHandling">
+        <xsd:annotation>
+            <xsd:documentation>List of foreign exchange rates or technical error report</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:choice>
+                <xsd:element name="FxRate" type="FxRateHandling" maxOccurs="unbounded">
+                    <xsd:annotation>
+                        <xsd:documentation>Exchange rate for currency pair</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                <xsd:element name="OprlErr" type="OprlErrHandling">
+                    <xsd:annotation>
+                        <xsd:documentation>Technical error report</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="FxRateHandling">
+        <xsd:sequence>
+            <xsd:element name="Tp" type="FxRateTypeHandling">
+                <xsd:annotation>
+                    <xsd:documentation>Foreign exchange rate type identifier</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="Dt" type="ISODate">
+                <xsd:annotation>
+                    <xsd:documentation>Foreign exchange rate date</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="CcyAmt" type="CcyAmtHandling" minOccurs="2" maxOccurs="2">
+                <xsd:annotation>
+                    <xsd:documentation>Currency code and amount</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:simpleType name="FxRateTypeHandling">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="LT">
+                <xsd:annotation>
+                    <xsd:documentation>Foreign exchange rate in accordance to the Law on Accounting</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="EU">
+                <xsd:annotation>
+                    <xsd:documentation>Foreign exchange rate by date of publication</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="CcyAmtHandling">
+        <xsd:sequence>
+            <xsd:element name="Ccy" type="Ccy_ISO_4217">
+                <xsd:annotation>
+                    <xsd:documentation>Currency code</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="Amt" type="Amount">
+                <xsd:annotation>
+                    <xsd:documentation>Currency amount</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="OprlErrHandling">
+        <xsd:sequence>
+            <xsd:element name="Err" type="ErrorCode">
+                <xsd:annotation>
+                    <xsd:documentation>Error code</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="Desc" type="Max2000Text" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>Error description</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ErrorCode">
+        <xsd:sequence>
+            <xsd:element name="Prtry" type="Max16AlphaNumericText">
+                <xsd:annotation>
+                    <xsd:documentation>XML error code</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:simpleType name="Amount">
+        <xsd:restriction base="xsd:decimal">
+            <xsd:minExclusive value="0"/>
+            <xsd:maxExclusive value="1000000000000"/>
+            <xsd:fractionDigits value="7"/>
+            <xsd:totalDigits value="20"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="ISODate">
+        <xsd:restriction base="xsd:date"/>
+    </xsd:simpleType>
+    <xsd:simpleType name="Max2000Text">
+        <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1"/>
+            <xsd:maxLength value="2000"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="Max16AlphaNumericText">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[a-zA-Z0-9]{1,16}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>
