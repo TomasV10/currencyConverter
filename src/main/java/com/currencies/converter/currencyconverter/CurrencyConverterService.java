@@ -21,6 +21,7 @@ public class CurrencyConverterService {
         this.currencyRatesService = currencyRatesService;
     }
 
+
     public CurrencyRatesDto getConversionRatesFor(String baseCurrencyUnit) {
         List<CurrencyRate> currentRatesFor = currencyRatesService.getCurrentRatesFor(baseCurrencyUnit);
         return new CurrencyRatesDto(toDto(currentRatesFor));
@@ -28,13 +29,14 @@ public class CurrencyConverterService {
 
     private List<CurrencyRateDto> toDto(List<CurrencyRate> currentRatesFor) {
         return currentRatesFor.stream()
-                .map(rate -> new CurrencyRateDto(rate.getCurrencyUnit(), rate.getDate(), toConversionRateDto(rate.getConversionRate())))
+                .map(rate -> new CurrencyRateDto(rate.getId(),rate.getCurrencyUnit(), rate.getDate(),
+                        toConversionRateDto(rate.getConversionRate())))
                 .collect(toList());
     }
 
     private List<ConversionRateDto> toConversionRateDto(List<ConversionRate> rates) {
         return rates.stream()
-                .map(rate -> new ConversionRateDto(rate.getCurrencyUnit(), rate.getRate()))
+                .map(rate -> new ConversionRateDto(rate.getId(),rate.getCurrencyUnit(), rate.getRate()))
                 .collect(toList());
     }
 }

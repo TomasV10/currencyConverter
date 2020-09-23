@@ -3,10 +3,7 @@ package com.currencies.converter.currencyconverter;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.currencies.converter.currencyconverter.dto.CurrencyRatesDto;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/currencies", produces = APPLICATION_JSON_VALUE)
@@ -27,5 +24,7 @@ public class CurrencyConverterController {
     public CurrencyRatesDto getListOfCurrencies() {
         return currencyConverterService.getConversionRatesFor("EU");
     }
+
+
 
 }
