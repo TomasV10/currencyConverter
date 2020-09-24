@@ -2,14 +2,14 @@ package com.currencies.converter.rates;
 
 import static java.util.stream.Collectors.toList;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import com.currencies.converter.lietuvosbankas.LBCurrenciesClient;
 import lt.lb.webservices.fxrates.CcyAmtHandling;
 import lt.lb.webservices.fxrates.FxRatesHandling;
-import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -26,6 +26,37 @@ public class CurrencyRatesService {
     public List<CurrencyRate> getCurrentRatesFor(String currencyUnit) {
         saveToDB(currencyUnit);
         return getAllCurrenciesDB();
+    }
+
+
+
+    public BigDecimal convertFromEurOrTo(String fromCurrencyUnit, String toCurrencyUnit,
+                                         BigDecimal amountOfMoneyToConvert){
+        if(fromCurrencyUnit.equals("EUR")){
+            return (amountOfMoneyToConvert.multiply(getRateByUnit(toCurrencyUnit)));
+        }else {
+            return (amountOfMoneyToConvert.divide(getRateByUnit(fromCurrencyUnit), 2, RoundingMode.UP));
+        }
+    }
+
+    public BigDecimal getRateByUnit(String currencyUnit){
+        return getConversionRates().stream()
+                .filter(cr -> cr.getCurrencyUnit().equals(currencyUnit))
+                .map(ConversionRate::getRate)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Conversion not found " + currencyUnit));
+
+    }
+
+    public CurrencyRate getRateById(Long id){
+        return ratesRepository.getOne(id);
+    }
+
+    public List<ConversionRate>getConversionRates(){
+        return getAllCurrenciesDB().stream()
+                .map(CurrencyRate::getConversionRate)
+                .flatMap(List::stream)
+                .collect(toList());
     }
 
     private List<CurrencyRate>saveToDB(String currencyUnit){
