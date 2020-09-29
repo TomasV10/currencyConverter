@@ -1,16 +1,16 @@
 package com.currencies.converter.rates;
 
-import static java.util.stream.Collectors.toList;
+import com.currencies.converter.currencyconverter.dto.ConversionCurrency;
+import com.currencies.converter.lietuvosbankas.LBCurrenciesClient;
+import lt.lb.webservices.fxrates.CcyAmtHandling;
+import lt.lb.webservices.fxrates.FxRateHandling;
+import lt.lb.webservices.fxrates.FxRatesHandling;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.Optional;
-
-import com.currencies.converter.lietuvosbankas.LBCurrenciesClient;
-import lt.lb.webservices.fxrates.CcyAmtHandling;
-import lt.lb.webservices.fxrates.FxRatesHandling;
-import org.springframework.stereotype.Component;
+import java.util.stream.Collectors;
 
 @Component
 public class CurrencyRatesService {
@@ -23,61 +23,59 @@ public class CurrencyRatesService {
         this.ratesRepository = ratesRepository;
     }
 
-    public List<CurrencyRate> getCurrentRatesFor(String currencyUnit) {
-        saveToDB(currencyUnit);
-        return getAllCurrenciesDB();
-    }
-
-
-
-    public BigDecimal convertFromEurOrTo(String fromCurrencyUnit, String toCurrencyUnit,
-                                         BigDecimal amountOfMoneyToConvert){
-        if(fromCurrencyUnit.equals("EUR")){
-            return (amountOfMoneyToConvert.multiply(getRateByUnit(toCurrencyUnit)));
+    public List<ConversionRate> getCurrentRatesFor(String currencyUnit) {
+        List<ConversionRate> dataFromDB = getAllConversionRates();
+        if(dataFromDB.isEmpty()){
+            saveToDataBase(dataFromLB(currencyUnit));
+           return getAllConversionRates();
         }else {
-            return (amountOfMoneyToConvert.divide(getRateByUnit(fromCurrencyUnit), 2, RoundingMode.UP));
+            return dataFromDB;
         }
     }
 
-    public BigDecimal getRateByUnit(String currencyUnit){
-        return getConversionRates().stream()
-                .filter(cr -> cr.getCurrencyUnit().equals(currencyUnit))
+    public BigDecimal convertFromCurrencyToCurrency(ConversionCurrency conversionCurrency){
+        List<ConversionRate>currentRatesFor = getCurrentRatesFor(conversionCurrency.getConvertFrom());
+        if(conversionCurrency.getAmountOfMoney().compareTo(BigDecimal.ZERO) < 0 ) {
+            throw new IllegalArgumentException("Only positive numbers, you entered " +
+                    conversionCurrency.getAmountOfMoney());
+        }else if(!currentRatesFor.isEmpty()){
+            return (conversionCurrency.getAmountOfMoney().multiply(getRateByUnit(conversionCurrency))
+                    .setScale(2, RoundingMode.HALF_UP));
+        }else throw new IllegalStateException("Conversion rates for given currencies " +
+                conversionCurrency.getConvertFrom() + " and " + conversionCurrency.getConvertTo() + " not found");
+    }
+
+    private BigDecimal getRateByUnit (ConversionCurrency conversionCurrency){
+        return getCurrentRatesFor(conversionCurrency.getConvertFrom()).stream()
+                .filter(cr -> cr.getCurrencyFrom().equals(conversionCurrency.getConvertFrom().toUpperCase()) &&
+                        cr.getCurrencyTo().equals(conversionCurrency.getConvertTo().toUpperCase()) ||
+                        cr.getCurrencyTo().equals(conversionCurrency.getConvertFrom().toUpperCase()) &&
+                                cr.getCurrencyFrom().equals(conversionCurrency.getConvertTo().toUpperCase()))
                 .map(ConversionRate::getRate)
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Conversion not found " + currencyUnit));
-
+                .orElseThrow(() -> new IllegalStateException("Conversion not found " +
+                        conversionCurrency.getConvertFrom()));
     }
 
-    public CurrencyRate getRateById(Long id){
-        return ratesRepository.getOne(id);
-    }
-
-    public List<ConversionRate>getConversionRates(){
-        return getAllCurrenciesDB().stream()
-                .map(CurrencyRate::getConversionRate)
-                .flatMap(List::stream)
-                .collect(toList());
-    }
-
-    private List<CurrencyRate>saveToDB(String currencyUnit){
-        FxRatesHandling allCurrencies = lbCurrenciesClient.getAllCurrencies(currencyUnit);
-        return ratesRepository.saveAll(convertToEntities(allCurrencies));
-    }
-
-    private List<CurrencyRate>getAllCurrenciesDB(){
+    private List<ConversionRate> getAllConversionRates(){
         return ratesRepository.findAll();
     }
-
-    private List<CurrencyRate> convertToEntities(FxRatesHandling rates) {
-        return rates.getFxRate().stream()
-                .map(rate -> new CurrencyRate(rate.getTp().name(), rate.getDt().toGregorianCalendar().toZonedDateTime()
-                        .toLocalDate(), toConversionRate(rate.getCcyAmt())))
-                .collect(toList());
+    private void saveToDataBase(FxRatesHandling allCurrencies){
+        convertToEntities(allCurrencies);
     }
 
-    private List<ConversionRate> toConversionRate(List<CcyAmtHandling> ccyAmtHandling) {
-        return ccyAmtHandling.stream()
-                .map(ccy -> new ConversionRate(ccy.getCcy().name(), ccy.getAmt()))
-                .collect(toList());
+    private FxRatesHandling dataFromLB(String currencyUnit){
+        return lbCurrenciesClient.getAllCurrencies(currencyUnit);
+    }
+
+    private void convertToEntities(FxRatesHandling rates) {
+        List<FxRateHandling> conversionRates = rates.getFxRate();
+        for (FxRateHandling rate : conversionRates ){
+            for(CcyAmtHandling ccy : rate.getCcyAmt()){
+                ConversionRate conversionRate = new ConversionRate(rate.getTp().name(), ccy.getCcy().name(),
+                        ccy.getAmt(), rate.getDt().toGregorianCalendar().toZonedDateTime().toLocalDate());
+                ratesRepository.save(conversionRate);
+            }
+        }
     }
 }

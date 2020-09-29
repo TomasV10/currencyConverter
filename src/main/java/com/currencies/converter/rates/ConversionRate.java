@@ -2,25 +2,36 @@ package com.currencies.converter.rates;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "conversion_rate")
 public class ConversionRate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "currency_unit")
-    private String currencyUnit;
+    @Column(name = "currency_from")
+    private String currencyFrom;
+    @Column(name = "currency_to")
+    private String currencyTo;
     @Column(name = "rate")
     private BigDecimal rate;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private CurrencyRate currencyRate;
+    @Column(name = "date")
+    private LocalDate date;
 
     public ConversionRate() {
     }
 
-    public ConversionRate(String currencyUnit, BigDecimal rate) {
-        this.currencyUnit = currencyUnit;
+    public ConversionRate(String currencyTo, BigDecimal rate) {
+        this.currencyTo = currencyTo;
         this.rate = rate;
+    }
+
+    public ConversionRate(String currencyFrom, String currencyTo, BigDecimal rate, LocalDate date) {
+        this.currencyFrom = currencyFrom;
+        this.currencyTo = currencyTo;
+        this.rate = rate;
+        this.date = date;
     }
 
     public Long getId() {
@@ -31,20 +42,28 @@ public class ConversionRate {
         this.id = id;
     }
 
-    public CurrencyRate getCurrencyRate() {
-        return currencyRate;
+    public String getCurrencyFrom() {
+        return currencyFrom;
     }
 
-    public void setCurrencyRate(CurrencyRate currencyRate) {
-        this.currencyRate = currencyRate;
+    public void setCurrencyFrom(String currencyFrom) {
+        this.currencyFrom = currencyFrom;
     }
 
-    public String getCurrencyUnit() {
-        return currencyUnit;
+    public String getCurrencyTo() {
+        return currencyTo;
     }
 
-    public void setCurrencyUnit(String currencyUnit) {
-        this.currencyUnit = currencyUnit;
+    public void setCurrencyTo(String currencyTo) {
+        this.currencyTo = currencyTo;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public BigDecimal getRate() {

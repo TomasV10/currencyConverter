@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body class="container">
+<form action="#" th:action="@{/mvc/currencies/convert}" th:object="${conversionCurrency}"
+      method="POST">
+    <div class="blu-margin">
+        <select class="form-control" th:field="*{convertFrom}" id="dropFromCurrency">
+            <option th:value="${conversionRates[0].fromCurrency}"
+                    th:text=" ${conversionRates[0].fromCurrency}">
+            </option>
+        </select>
+        <select class="form-control" th:field="*{convertTo}" id="dropToCurrency">
+            <option value="">Choose currency you want to convert to</option>
+            <option th:each="currency : ${conversionRates}"
+                    th:value="${currency.toCurrency}"
+                    th:text="${currency.toCurrency}">
+            </option>
+        </select>
+        <div class="form-group">
+            <input type="text" class="form-control"
+                   name="amountOfMoneyToConvert"
+                   id="amountOfMoneyToConvert"
+                   placeholder="e.g. 500"
+                   th:field="*{amountOfMoney}">
+        </div>
+    </div>
+<!--    <div class="blu-margin">-->
+<!--        &lt;!&ndash;        <label for="fromCurrency">Choose currency you want to convert from</label><span style="color:red; font_weight:bold">*</span>&ndash;&gt;-->
+<!--        <select class="form-control" th:field="${conversionRates}" id="dropToCurrency">-->
+<!--            <option value="">Choose currency you want to convert To</option>-->
+<!--            <option th:each="currency : ${conversionRates}"-->
+<!--                    th:value="${currency.rate}"-->
+<!--                    th:text="${currency.toCurrency}">-->
+<!--            </option>-->
+<!--        </select>-->
+<!--    </div>-->
+    <div class="form-footer">
+        <button type="submit" class="btn btn-primary">Convert</button>
+    </div>
+</form>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
+</html>
