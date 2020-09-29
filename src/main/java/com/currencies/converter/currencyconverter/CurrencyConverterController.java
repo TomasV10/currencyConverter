@@ -1,15 +1,13 @@
 package com.currencies.converter.currencyconverter;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
-import com.currencies.converter.currencyconverter.dto.ConversionRateDto;
-import com.currencies.converter.currencyconverter.dto.CurrencyRateDto;
-import com.currencies.converter.currencyconverter.dto.CurrencyRatesDto;
+import com.currencies.converter.currencyconverter.dto.ConversionCurrency;
+import com.currencies.converter.currencyconverter.dto.ConversionRatesDto;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.PermitAll;
 import java.math.BigDecimal;
-import java.util.List;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 
 @RestController
 @RequestMapping(value = "/api/currencies", produces = APPLICATION_JSON_VALUE)
@@ -22,34 +20,20 @@ public class CurrencyConverterController {
     }
 
     @GetMapping
-    public CurrencyRatesDto getListOfCurrencies(@RequestParam("baseUnit") String baseUnit) {
+    public ConversionRatesDto getListOfCurrencies(@RequestParam("baseUnit") String baseUnit) {
         return currencyConverterService.getConversionRatesFor(baseUnit);
     }
 
     @GetMapping(path = "/test")
-    public CurrencyRatesDto getListOfCurrencies() {
+    public ConversionRatesDto getListOfCurrencies() {
         return currencyConverterService.getConversionRatesFor("EU");
     }
 
-    @GetMapping("/{id}")
-    public CurrencyRateDto getCurrencyById(@PathVariable Long id){
-        return currencyConverterService.getCurrencyRateById(id);
+
+    @PostMapping("/convert")
+    public BigDecimal getConvertedAmount(@RequestBody ConversionCurrency conversionCurrency){
+        return currencyConverterService.getAmountOfConvertedMoney(conversionCurrency);
     }
 
-    @GetMapping("/unit")
-    public List<ConversionRateDto> getListOfConversionRates(){
-        return currencyConverterService.getAllConversionRates();
-    }
 
-    @GetMapping("/rateByUnit/{currencyUnit}")
-    public BigDecimal getConversionRateByUnit(@PathVariable("currencyUnit") String currencyUnit){
-        return currencyConverterService.getRateByCurrencyUnit(currencyUnit);
-    }
-
-    @GetMapping("/amount/{fromCurrencyUnit}/{toCurrencyUnit}/{amountOfMoneyToConvert}")
-    public BigDecimal getConvertedAmount(@PathVariable("fromCurrencyUnit") String fromCurrencyUnit,
-                                         @PathVariable("toCurrencyUnit") String toCurrencyUnit,
-                                         @PathVariable("amountOfMoneyToConvert") BigDecimal amountOfMoney){
-        return currencyConverterService.getAmountOfConvertedMoney(fromCurrencyUnit, toCurrencyUnit, amountOfMoney);
-    }
 }
