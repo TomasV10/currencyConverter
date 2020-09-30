@@ -1,6 +1,6 @@
 # currencyConverter
 {
-Run the program first. In you browser enter http://localhost:8080/mvc/currencies?baseUnit=EU
+Run the program first. In you browser enter http://localhost:8080/mvc/currencies
 BaseUnit could be EU or LT, because LB (Lietuvos bankas) gives rates only for these two currencies. 
 }
 {
