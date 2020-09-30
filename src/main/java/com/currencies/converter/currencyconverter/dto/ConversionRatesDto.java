@@ -3,21 +3,20 @@ package com.currencies.converter.currencyconverter.dto;
 import java.util.List;
 
 public class ConversionRatesDto {
-    List<ConversionRateDto>rates;
+    private List<String> currencyUnits;
 
     public ConversionRatesDto() {
     }
 
-    public ConversionRatesDto(List<ConversionRateDto> rates) {
-        this.rates = rates;
+    public ConversionRatesDto(List<String> currencyUnits) {
+        this.currencyUnits = currencyUnits;
     }
 
-    public List<ConversionRateDto> getRates() {
-        return rates;
+    public List<String> getCurrencyUnits() {
+        return currencyUnits;
     }
 
-    public void setRates(List<ConversionRateDto> rates) {
-        this.rates = rates;
+    public void setCurrencyUnits(List<String> currencyUnits) {
+        this.currencyUnits = currencyUnits;
     }
-
 }

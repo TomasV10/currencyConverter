@@ -3,40 +3,40 @@ package com.currencies.converter.currencyconverter.dto;
 import java.math.BigDecimal;
 
 public class ConversionCurrency {
-    private String convertFrom;
-    private String convertTo;
-    private BigDecimal amountOfMoney;
+    private String currencyToConvertFrom;
+    private String currencyToConvertTo;
+    private BigDecimal amount;
 
     public ConversionCurrency() {
     }
 
-    public ConversionCurrency(String convertFrom, String convertTo, BigDecimal amountOfMoney) {
-        this.convertFrom = convertFrom;
-        this.convertTo = convertTo;
-        this.amountOfMoney = amountOfMoney;
+    public ConversionCurrency(String currencyToConvertFrom, String currencyToConvertTo, BigDecimal amount) {
+        this.currencyToConvertFrom = currencyToConvertFrom;
+        this.currencyToConvertTo = currencyToConvertTo;
+        this.amount = amount;
     }
 
-    public String getConvertFrom() {
-        return convertFrom;
+    public String getCurrencyToConvertFrom() {
+        return currencyToConvertFrom;
     }
 
-    public void setConvertFrom(String convertFrom) {
-        this.convertFrom = convertFrom;
+    public void setCurrencyToConvertFrom(String currencyToConvertFrom) {
+        this.currencyToConvertFrom = currencyToConvertFrom;
     }
 
-    public String getConvertTo() {
-        return convertTo;
+    public String getCurrencyToConvertTo() {
+        return currencyToConvertTo;
     }
 
-    public void setConvertTo(String convertTo) {
-        this.convertTo = convertTo;
+    public void setCurrencyToConvertTo(String currencyToConvertTo) {
+        this.currencyToConvertTo = currencyToConvertTo;
     }
 
-    public BigDecimal getAmountOfMoney() {
-        return amountOfMoney;
+    public BigDecimal getAmount() {
+        return amount;
     }
 
-    public void setAmountOfMoney(BigDecimal amountOfMoney) {
-        this.amountOfMoney = amountOfMoney;
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 }
