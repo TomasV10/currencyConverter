@@ -22,15 +22,19 @@ public class CurrencyConverterService {
     }
 
     @Transactional(readOnly = true)
-    public ConversionRatesDto getConversionRatesFor(String baseCurrencyUnit){
-        List<ConversionRate> currentRatesFor = currencyRatesService.getCurrentRatesFor(baseCurrencyUnit);
-        if(currentRatesFor.isEmpty()){
-            throw new IllegalStateException("Conversion Rates not found");
-        } else return new ConversionRatesDto(toDto(currentRatesFor));
+    public ConversionRatesDto getPossibleCurrencyUnits() {
+        List<String> availableCurrencyUnits = currencyRatesService.getAvailableCurrencyUnits();
+        if (availableCurrencyUnits.isEmpty()) {
+            throw new IllegalStateException("Currency units not found");
+        }
+        return new ConversionRatesDto(availableCurrencyUnits);
     }
 
-    public BigDecimal getAmountOfConvertedMoney(ConversionCurrency conversionCurrency){
-        return currencyRatesService.convertFromCurrencyToCurrency(conversionCurrency);
+    public BigDecimal getAmountOfConvertedMoney(ConversionCurrency conversionCurrency) {
+        return currencyRatesService.convertFromCurrencyToCurrency(
+                conversionCurrency.getCurrencyToConvertFrom(),
+                conversionCurrency.getCurrencyToConvertTo(),
+                conversionCurrency.getAmount());
     }
 
     private List<ConversionRateDto> toDto(List<ConversionRate> conversionRatesFor) {
